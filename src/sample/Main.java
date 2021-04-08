@@ -18,13 +18,15 @@ import org.apache.commons.lang3.ArrayUtils;
 public class Main extends Application {
 
     public static class encryption {
+        //Char array which holds all characters supported by the cipher
         private static char[] cipher = {'\t', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '.', '_', ',', ':', '"', '-', '\'', '/', '\\', '=', '+', '?' , '!', '$', '*', '>', '<', '@', '{', '}', '(', ')', '[', ']', ';', '\n', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
+        //Constant which holds the length of the char array
         static int ARRAY_LENGTH = cipher.length;
-        public static String getCipherAtIndex(int index1) {
-            return String.valueOf(cipher[index1]);
-        }
 
+        // Method which replaces a character in a specific position in a string. Takes the position of
+        // the character to replace, which character to replace it with, and the string which you want
+        // to replace the character in
         public static String replaceCharInPosition(int position, char ch, String str) {
             char[] charArray = str.toCharArray();
             charArray[position] = ch;
@@ -116,6 +118,7 @@ public class Main extends Application {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
         Label messageLabel = new Label("Message:");
+        messageLabel.setPadding(new Insets(0, 0, 5, 0));
         grid.add(messageLabel, 0, 0);
 
         TextArea message = new TextArea();
@@ -123,6 +126,7 @@ public class Main extends Application {
         grid.add(message, 0, 1);
 
         Label keyLabel = new Label("Key (Must be 10 digits or less):");
+        keyLabel.setPadding(new Insets(20, 0, 5, 0));
         grid.add(keyLabel, 0, 2);
 
         TextField keyField = new TextField();
@@ -138,8 +142,8 @@ public class Main extends Application {
         Button decryptButton = new Button("Decrypt");
        // grid.add(decryptButton, 0, 5);
 
-        buttons.setMargin(encryptButton, new Insets(15,15,10,0));
-        buttons.setMargin(decryptButton, new Insets(15,0,10,15));
+        buttons.setMargin(encryptButton, new Insets(15,0,0,0));
+        buttons.setMargin(decryptButton, new Insets(15,0,0,0));
         ObservableList list = buttons.getChildren();
         list.addAll(encryptButton, decryptButton);
         grid.add(buttons, 0, 4);
@@ -167,6 +171,7 @@ public class Main extends Application {
 
         Scene scene = new Scene(grid, 500, 350);
         primaryStage.setScene(scene);
+        scene.getStylesheets().add(Main.class.getResource("sample.css").toExternalForm());
         primaryStage.show();
     }
 
