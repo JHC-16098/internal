@@ -6,10 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
@@ -18,9 +15,22 @@ import org.apache.commons.lang3.ArrayUtils;
 public class Main extends Application {
 
     public static class encryption {
+
+        public static void wait(int ms)
+        {
+            try
+            {
+                Thread.sleep(ms);
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
+        }
+
         //Char array which holds all characters supported by the cipher
-        //private static char[] cipher = {'\t', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '.', '_', ',', ':', '"', '-', '\'', '/', '\\', '=', '+', '?' , '!', '$', '*', '>', '<', '@', '{', '}', '(', ')', '[', ']', ';', '\n', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        private static char[] cipher = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
+        private static char[] cipher = {'\t', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '.', '_', ',', ':', '"', '-', '\'', '/', '\\', '=', '+', '?' , '!', '$', '*', '>', '<', '@', '#', '%', '^', '&', '*', '{', '}', '(', ')', '[', ']', ';', '`', '|', '\n', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        //private static char[] cipher = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' '};
         //Constant which holds the length of the char array
         static int ARRAY_LENGTH = cipher.length;
 
@@ -37,10 +47,19 @@ public class Main extends Application {
         // the input char in the cipher array, then decreasing it by the offset to get the new char. It
         // then returns the new char.
         public static char encryptNewChar (char ch, int offset) {
-            int newCharIndex = ArrayUtils.indexOf(encryption.cipher, ch); // Get index of input char
-            System.out.println("Detected letter at method / index of letter: " + encryption.cipher[newCharIndex] + " / " + newCharIndex);
-            int offsetIndex = newCharIndex+offset; // Use offset to get index of new char
-
+            int offsetIndex = 0;
+            try {
+                int newCharIndex = ArrayUtils.indexOf(encryption.cipher, ch); // Get index of input char
+                System.out.println("Detected letter at method / index of letter: " + encryption.cipher[newCharIndex] + " / " + newCharIndex);
+                offsetIndex = newCharIndex + offset; // Use offset to get index of new char
+            } catch(ArrayIndexOutOfBoundsException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error: Character " + ch + " is not supported!");
+                alert.setHeaderText(null);
+                alert.setContentText("Error: Character " + ch + " is not supported!");
+                alert.showAndWait();
+                return '�';
+            }
             // A check to make sure that the offset stays in bounds of the array by counting back to the right side if the index goes negative
             int isOffsetCharNegative = checkPositive(offsetIndex);
             int newOffsetIndex;
@@ -54,7 +73,11 @@ public class Main extends Application {
 
             System.out.println("Offset at encryptNewChar: " + offset);
             System.out.println("newOffsetIndex: " + newOffsetIndex);
-            char offsetChar = encryption.cipher[newOffsetIndex]; // set new char
+            char offsetChar = 'a';
+
+                offsetChar = encryption.cipher[newOffsetIndex]; // set new char
+
+
 
             System.out.println("Char at method: " + offsetChar);
             return offsetChar;
@@ -92,8 +115,16 @@ public class Main extends Application {
         }
 
         // Method whick encrypts a string using an offset. Takes the source string and the key as arguments.
-        public static String encrypt(String cleartext, long key) {
-            int charOffset = encryption.getOffset(key); // Run method to get offset from key
+        public static void encrypt(String cleartext, long key, int mode, TextArea textBox) {
+            int charOffset = 0;
+
+            if (mode == 0) {
+                charOffset = encryption.getOffset(key);
+            }
+            else if (mode == 1) {
+                charOffset = (encryption.getDecryptOffset(encryption.getOffset(key)));
+            }
+            //int charOffset = encryption.getOffset(key); // Run method to get offset from key
 
             // Iterates over each character in the source string, using the encryptNewChar method to get the
             // offset char, then uses the replaceCharInPosition method to replace the old char with the offset
@@ -102,32 +133,16 @@ public class Main extends Application {
                 char[] tempCharArray = {cleartext.charAt(c)}; // Converts the individual character into a one-element char array to be passed to encryptNewChar
                 System.out.println("tempCharArray: " + tempCharArray[0]);
                 char charAtOffset = encryption.encryptNewChar(tempCharArray[0], charOffset);
-                    System.out.println("Offset char in function: " + charAtOffset + "\n--------------------------");
-                    cleartext = encryption.replaceCharInPosition(c, charAtOffset, cleartext);
+                System.out.println("Offset char in function: " + charAtOffset + "\n--------------------------");
+                cleartext = encryption.replaceCharInPosition(c, charAtOffset, cleartext);
+                textBox.setText(cleartext);
+
+
             }
 
             System.out.println(cleartext);
-            return cleartext;
         }
 
-        //Similar to encrypt, except it uses getDecryptOffset to generate an inverted offset
-        public static String decrypt(String encrypted, long key) {
-            // get decrypt offset by passing the result off the getOffset method to the decryptOffset function, which reverses it.
-            int charOffset = (encryption.getDecryptOffset(encryption.getOffset(key)));
-
-            // Same as encrypt - iterates over each character in the encrypted string, using the encryptNewChar method
-            // to get the offset char, then uses the replaceCharInPosition method to replace the old char with the offset
-            // char from encryptNewChar.
-            for (int c=0; c < encrypted.length(); c++) {
-                char[] tempCharArray = {encrypted.charAt(c)};
-                System.out.println("tempCharArray: " + tempCharArray[0]);
-                char charAtOffset = encryption.encryptNewChar(tempCharArray[0], charOffset);
-                System.out.println("Offset char in function: " + charAtOffset + "\n--------------------------");
-                encrypted = encryption.replaceCharInPosition(c, charAtOffset, encrypted);
-            }
-            System.out.println(encrypted);
-            return encrypted;
-        }
     }
 
     @Override
@@ -174,15 +189,15 @@ public class Main extends Application {
         //Add HBox to grid
         grid.add(buttons, 0, 4);
 
-        /*
+
         //Event handler for Encrypt button which calls the encrypt method
         encryptButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 String cleartext = message.getText();
                 long key = Integer.parseInt(keyField.getText());
-                String encryptedText = encryption.encrypt(cleartext, key);
-                message.setText(encryptedText);
+                encryption.encrypt(cleartext, key, 0, message);
+                //message.setText(encryptedText);
             }
         });
 
@@ -193,18 +208,18 @@ public class Main extends Application {
             public void handle(ActionEvent e) {
                 String cleartext = message.getText();
                 long key = Integer.parseInt(keyField.getText());
-                String encryptedText = encryption.decrypt(cleartext, key);
-                message.setText(encryptedText);
+                encryption.encrypt(cleartext, key, 1, message);
+                //message.setText(encryptedText);
             }
         });
 
-        */
+
 
         //Set window size, add scene to window
         Scene scene = new Scene(grid, 500, 350);
         primaryStage.setScene(scene);
         //Import CSS file
-        //scene.getStylesheets().add(Main.class.getResource("sample.css").toExternalForm());
+        scene.getStylesheets().add(Main.class.getResource("sample.css").toExternalForm());
         //Show stage on window
         primaryStage.show();
     }
